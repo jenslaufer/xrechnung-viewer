@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>XRechnung öffnen &amp; lesen – kostenloser XRechnung-Viewer | Solytics</title>
+  <meta name="description" content="XRechnung-XML kostenlos im Browser öffnen, lesen und als PDF speichern. Unterstützt UBL und CII (UN/CEFACT). 100 % im Browser – Ihre Rechnung wird nicht hochgeladen." />
+  <link rel="canonical" href="https://jenslaufer.github.io/xrechnung-viewer/" />
+  <meta property="og:title" content="XRechnung öffnen & lesen – kostenloser Viewer" />
+  <meta property="og:description" content="XRechnung-XML im Browser lesbar machen und als PDF speichern. Sicher, ohne Upload." />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="de_DE" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231b3a6b'/%3E%3Ctext x='16' y='22' font-size='16' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='700'%3EX%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {"@type":"Question","name":"Wie öffne ich eine XRechnung?","acceptedAnswer":{"@type":"Answer","text":"Eine XRechnung ist eine XML-Datei. Laden Sie die .xml-Datei in den XRechnung-Viewer – sie wird sofort als lesbare Rechnung angezeigt. Die Datei bleibt dabei in Ihrem Browser und wird nicht hochgeladen."}},
+      {"@type":"Question","name":"Werden meine Rechnungsdaten hochgeladen?","acceptedAnswer":{"@type":"Answer","text":"Nein. Die XRechnung wird vollständig in Ihrem Browser verarbeitet. Es werden keine Rechnungsdaten an einen Server gesendet."}},
+      {"@type":"Question","name":"Unterstützt der Viewer ZUGFeRD?","acceptedAnswer":{"@type":"Answer","text":"Der Viewer liest XRechnung-XML im UBL- und CII-Format. ZUGFeRD-Rechnungen sind PDF-Dateien mit eingebettetem XML; extrahieren Sie das XML oder laden Sie die XML-Datei direkt."}}
+    ]
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="./">
+        <span class="brand-mark">X</span>
+        <span class="brand-text">XRechnung&nbsp;Viewer</span>
+      </a>
+      <nav class="header-nav">
+        <a href="#faq">Hilfe</a>
+        <a href="#pro">Pro</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap">
+        <p class="eyebrow">Kostenlos · Ohne Anmeldung · Ohne Upload</p>
+        <h1>XRechnung öffnen und lesen</h1>
+        <p class="lede">
+          Sie haben eine <strong>XRechnung</strong> als XML-Datei erhalten und sehen nur kryptischen Code?
+          Laden Sie sie hier hoch und lesen Sie die Rechnung in Sekunden – als saubere, druckbare Übersicht.
+          Die Datei bleibt dabei <strong>in Ihrem Browser</strong>.
+        </p>
+
+        <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="XRechnung-Datei auswählen oder hierher ziehen">
+          <input type="file" id="fileInput" accept=".xml,text/xml,application/xml" hidden />
+          <svg class="dz-icon" viewBox="0 0 24 24" width="40" height="40" aria-hidden="true">
+            <path d="M12 16V4m0 0l-4 4m4-4l4 4M5 20h14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <p class="dz-title">XRechnung-XML hierher ziehen</p>
+          <p class="dz-sub">oder <button type="button" id="browseBtn" class="linklike">Datei auswählen</button></p>
+          <p class="dz-demo">Keine Datei zur Hand? <button type="button" class="linklike" data-demo="ubl">Beispiel (UBL)</button> · <button type="button" class="linklike" data-demo="cii">Beispiel (CII)</button></p>
+        </div>
+        <p id="errorBox" class="errorbox" hidden></p>
+        <p class="privacy-note">
+          <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+          100 % clientseitig – Ihre Rechnung verlässt diesen Browser nicht.
+        </p>
+      </div>
+    </section>
+
+    <section id="result" class="result" hidden>
+      <div class="wrap">
+        <div class="result-bar no-print">
+          <div class="result-meta">
+            <span class="badge" id="formatBadge"></span>
+            <span class="result-file" id="fileName"></span>
+          </div>
+          <div class="result-actions">
+            <button type="button" id="printBtn" class="btn btn-primary">Als PDF speichern</button>
+            <button type="button" id="resetBtn" class="btn btn-ghost">Andere Datei</button>
+          </div>
+        </div>
+        <article id="invoice" class="invoice"></article>
+      </div>
+    </section>
+
+    <section id="pro" class="pro no-print">
+      <div class="wrap pro-inner">
+        <div class="pro-copy">
+          <p class="eyebrow eyebrow-light">Demnächst</p>
+          <h2>XRechnung&nbsp;Viewer Pro – für alle, die täglich E-Rechnungen verarbeiten</h2>
+          <ul class="pro-list">
+            <li><strong>Stapelverarbeitung</strong> – viele XRechnungen auf einmal in PDFs umwandeln, als ZIP herunterladen.</li>
+            <li><strong>Eigenes Logo &amp; Layout</strong> – revisionssichere PDFs im Look Ihrer Buchhaltung.</li>
+            <li><strong>ZUGFeRD</strong> – XML direkt aus ZUGFeRD-PDFs extrahieren und anzeigen.</li>
+          </ul>
+          <p class="pro-sub">Sagen Sie uns Bescheid, sobald es so weit ist – kein Spam, nur eine Mail zum Start.</p>
+        </div>
+        <form id="waitlistForm" class="waitlist" novalidate>
+          <label for="wlEmail">E-Mail für die Pro-Warteliste</label>
+          <div class="waitlist-row">
+            <input type="email" id="wlEmail" name="email" placeholder="ihre@firma.de" autocomplete="email" required />
+            <button type="submit" class="btn btn-primary" id="wlSubmit">Vormerken</button>
+          </div>
+          <input type="text" id="wlCompanyTrap" class="trap" tabindex="-1" autocomplete="off" aria-hidden="true" />
+          <p class="waitlist-status" id="wlStatus" role="status"></p>
+          <p class="waitlist-fineprint">Mit dem Absenden stimmen Sie zu, dass wir Ihre E-Mail zur einmaligen Benachrichtigung speichern (<a href="#datenschutz">Datenschutz</a>).</p>
+        </form>
+      </div>
+    </section>
+
+    <section id="faq" class="faq no-print">
+      <div class="wrap">
+        <h2>Häufige Fragen zur XRechnung</h2>
+        <div class="faq-grid">
+          <div class="faq-item">
+            <h3>Was ist eine XRechnung?</h3>
+            <p>Die XRechnung ist das deutsche Standardformat für elektronische Rechnungen nach EN&nbsp;16931. Sie ist eine strukturierte XML-Datei – maschinenlesbar, aber für Menschen ohne Hilfsmittel schwer zu lesen. Seit 2025 müssen Unternehmen in Deutschland E-Rechnungen empfangen können.</p>
+          </div>
+          <div class="faq-item">
+            <h3>Wie öffne ich eine XRechnung?</h3>
+            <p>Doppelklick genügt nicht – im Browser oder Editor sehen Sie nur XML-Code. Ziehen Sie die .xml-Datei stattdessen oben in den Viewer. Sie wird sofort als übersichtliche Rechnung mit Positionen, Steuern und Summen dargestellt.</p>
+          </div>
+          <div class="faq-item">
+            <h3>Ist das sicher?</h3>
+            <p>Ja. Die Verarbeitung passiert ausschließlich in Ihrem Browser (JavaScript). Es werden keine Daten an einen Server übertragen, nichts gespeichert, nichts hochgeladen.</p>
+          </div>
+          <div class="faq-item">
+            <h3>UBL, CII, ZUGFeRD – was unterstützt der Viewer?</h3>
+            <p>XRechnung gibt es als UBL- und als CII-XML (UN/CEFACT) – beide liest der Viewer. ZUGFeRD ist ein PDF mit eingebettetem XML; laden Sie die enthaltene XML-Datei, um sie anzuzeigen.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer no-print">
+    <div class="wrap footer-inner">
+      <div class="footer-brand">
+        <span class="brand-mark small">X</span>
+        <span>XRechnung Viewer · ein Werkzeug von <strong>Solytics</strong></span>
+      </div>
+      <nav class="footer-nav">
+        <a href="#impressum">Impressum</a>
+        <a href="#datenschutz">Datenschutz</a>
+      </nav>
+    </div>
+    <div class="wrap legal" id="datenschutz">
+      <h3>Datenschutz</h3>
+      <p>Der XRechnung-Viewer verarbeitet hochgeladene Rechnungsdateien ausschließlich lokal in Ihrem Browser. Es findet <strong>keine Übertragung von Rechnungsdaten</strong> an einen Server statt. Tragen Sie sich in die Pro-Warteliste ein, speichern wir ausschließlich Ihre E-Mail-Adresse zum Zweck der einmaligen Produktbenachrichtigung; Sie können der Speicherung jederzeit per Mail widersprechen.</p>
+      <h3 id="impressum">Impressum</h3>
+      <p>Solytics GmbH · Karlstein am Main · Angaben gemäß §&nbsp;5&nbsp;DDG werden vor der öffentlichen Bewerbung ergänzt.</p>
+    </div>
+  </footer>
+
+  <script src="parser.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

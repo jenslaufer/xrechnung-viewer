@@ -1,0 +1,8 @@
+{
+  "name": "xrechnung-viewer",
+  "version": "1.0.0",
+  "description": "Client-side XRechnung (UBL/CII) viewer with PDF export",
+  "private": true,
+  "scripts": { "test": "node parser.test.js" },
+  "devDependencies": { "@xmldom/xmldom": "^0.9.8" }
+}
