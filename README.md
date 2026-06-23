@@ -2,7 +2,7 @@
 
 Client-side web tool to open, read and print German **XRechnung** e-invoices (EN 16931 / XRechnung 3.0). A received `.xml` invoice is parsed in the browser and shown as a clean, human-readable document. No upload — the file never leaves the browser.
 
-**Live:** https://jenslaufer.github.io/xrechnung-viewer/
+**Live:** https://jenslaufer.com/xrechnung-viewer/
 
 ## Why
 
